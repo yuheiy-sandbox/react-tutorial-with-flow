@@ -2,31 +2,40 @@
 'use strict';
 import React from 'react';
 
+type Props = {
+  dispatch: Function
+};
+
+type State = {
+  author: string,
+  text: string
+};
+
 export default class CommentForm extends React.Component {
-  props: {
-    dispatch: Function
-  };
+  props: Props;
+  state: State;
 
-  state: {
-    author: string,
-    text: string
-  };
+  onSubmit: Function;
 
-  constructor(props?: any) {
+  constructor(props: Props) {
     super(props);
+
+    this.onSubmit = this.onSubmit.bind(this);
+
     this.state = {
       author: '',
       text: ''
     };
   }
 
-  // ev: Event
-  onChange(inputName: string, ev: any): void {
-    this.setState({[`${inputName}`]: ev.target.value});
+  // evt: SyntheticFormEvent
+  onChange(inputName: string, evt: any): void {
+    this.setState({[`${inputName}`]: evt.target.value});
   }
 
-  onSubmit(ev: Event): void {
-    ev.preventDefault();
+  // evt: SyntheticFormEvent
+  onSubmit(evt: SyntheticEvent): void {
+    evt.preventDefault();
     const author = this.state.author.trim();
     const text = this.state.text.trim();
     if (!author || !text) {
@@ -36,21 +45,21 @@ export default class CommentForm extends React.Component {
     this.setState({text: ''});
   }
 
-  render() {
+  render(): React.Element {
     const {author, text} = this.state;
     return (
-      <form onSubmit={this.onSubmit.bind(this)}>
+      <form onSubmit={this.onSubmit}>
         <input
           type="text"
           placeholder="Your name"
           value={author}
-          onChange={this.onChange.bind(this, 'author')}
+          onChange={(evt) => this.onChange('author', evt)}
         />
         <input
           type="text"
           placeholder="Say something..."
           value={text}
-          onChange={this.onChange.bind(this, 'text')}
+          onChange={(evt) => this.onChange('text', evt)}
         />
         <button type="submit">Post</button>
       </form>

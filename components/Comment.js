@@ -2,7 +2,12 @@
 'use strict';
 import React from 'react';
 
-export default function Comment({author, children}: {author: string, children?: any}) {
+type Props = {
+  author: string,
+  children?: any
+};
+
+export default function Comment({author, children}: Props): React.Element {
   return (
     <div>
       <h2>{author}</h2>

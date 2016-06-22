@@ -4,24 +4,25 @@ import React from 'react';
 import {EventEmitter} from 'events';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
-import type {CommentType} from '../Types';
+import type {CommentType} from './CommentType';
+
+type Props = {
+  url: string
+};
+
+type State = {
+  comments: Array<CommentType>
+};
 
 export default class CommentBox extends React.Component {
-  props: {
-    url: string
-  };
-
-  state: {
-    comments: Array<CommentType>
-  };
+  props: Props;
+  state: State;
 
   emitter: EventEmitter;
+  dispatch: Function;
 
-  constructor(props?: any) {
+  constructor(props: Props) {
     super(props);
-    this.state = {
-      comments: []
-    };
 
     this.emitter = new EventEmitter();
     this.emitter.on('addComment', (author: string, text: string) => {
@@ -32,6 +33,11 @@ export default class CommentBox extends React.Component {
       };
       this.setState({comments: this.state.comments.concat(newComment)});
     });
+    this.dispatch = this.emitter.emit.bind(this.emitter);
+
+    this.state = {
+      comments: []
+    };
   }
 
   loadCommentsFromServer(): Promise {
@@ -41,21 +47,20 @@ export default class CommentBox extends React.Component {
       .catch((ex) => console.error(ex));
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.loadCommentsFromServer();
   }
 
-  componentWillUnMount() {
+  componentWillUnMount(): void {
     this.emitter.removeAllListeners();
   }
 
-  render() {
-    const dispatch = this.emitter.emit.bind(this.emitter);
+  render(): React.Element {
     return (
       <div>
         <h1>Comments</h1>
         <CommentList comments={this.state.comments} />
-        <CommentForm dispatch={dispatch} />
+        <CommentForm dispatch={this.dispatch} />
       </div>
     );
   }
